@@ -1,15 +1,14 @@
-import test from 'ava';
+import test, { ExecutionContext } from 'ava';
 import { MockDAM } from '../DAM.mocks';
 import { Asset } from './Asset';
+import { AssetPut } from './AssetPut';
+import { AssetPutResultList } from './AssetPutResult';
 
 test('get asset by id', async (t) => {
   const client = new MockDAM();
   const result = await client.assets.get(
     '65d78690-bf4e-415d-a16c-ca4dadbb2717'
   );
-
-  // tslint:disable-next-line
-  console.log(result);
 
   t.is(result.label, 'AlltheLook1.jpg');
 });
@@ -294,7 +293,7 @@ test('get metadata (by id)', async (t) => {
 test('list assets', async (t) => {
   const client = new MockDAM();
 
-  const list = await client.assets.list();
+  const list = await client.assets.list({ q: 'example search query' });
   const items = list.getItems();
 
   t.deepEqual(
@@ -309,4 +308,110 @@ test('list assets', async (t) => {
       'List asset must be enriched with related actions.'
     );
   });
+});
+
+const assetStrip = [
+  'revisionNum',
+  'userId',
+  'file',
+  'createdDate',
+  'timestamp',
+  'tags',
+];
+
+function sharedPut(
+  t: ExecutionContext,
+  client: MockDAM,
+  requestIds: string[]
+): void {
+  for (let i = 0; i < requestIds.length; i++) {
+    const request = client.mock.history.put[i];
+
+    t.is(request.url, 'https://dam-live-api.adis.ws/v1.5.0/assets');
+
+    // Must strip reserved fields from body.
+
+    const data = JSON.parse(request.data);
+    t.is(data.assets[0].id, requestIds[i]);
+    data.assets.forEach((asset) => {
+      t.is(asset.label, 'Replacement label');
+
+      assetStrip.forEach((stripped) => {
+        t.is(asset[stripped], undefined);
+      });
+    });
+  }
+}
+
+test('put assets (by ids)', async (t) => {
+  const client = new MockDAM();
+
+  const list = await client.assets.list();
+  const items = list.getItems();
+
+  items.forEach((item) => (item.label = 'Replacement label'));
+
+  const result = await client.assets.putAsset('overwrite', items);
+
+  t.deepEqual(
+    result.results,
+    items.map((item) => ({ id: item.id, status: 'succeeded' }))
+  );
+
+  sharedPut(t, client, ['65d78690-bf4e-415d-a16c-ca4dadbb2717']);
+});
+
+test('put assets (self)', async (t) => {
+  const client = new MockDAM();
+
+  const list = await client.assets.list();
+  const items = list.getItems();
+
+  items.forEach((item) => (item.label = 'Replacement label'));
+
+  const result = [];
+
+  for (const item of items) {
+    item.label = 'Replacement label';
+    result.push(await item.related.update());
+  }
+
+  sharedPut(t, client, [
+    '65d78690-bf4e-415d-a16c-ca4dadbb2717',
+    '4a0bcaed-ee57-481f-98d3-4b73aad49e68',
+  ]);
+});
+
+test('put assets (using asset put interface)', async (t) => {
+  const client = new MockDAM();
+
+  const assetPut: AssetPut = {
+    id: '65d78690-bf4e-415d-a16c-ca4dadbb2717',
+    tags: { add: [], remove: [] },
+  };
+
+  const result = await client.assets.put('overwrite', [assetPut]);
+
+  t.deepEqual(result.results[0], {
+    id: '65d78690-bf4e-415d-a16c-ca4dadbb2717',
+    status: 'succeeded',
+  });
+
+  const request = client.mock.history.put[0];
+
+  t.is(request.url, 'https://dam-live-api.adis.ws/v1.5.0/assets');
+
+  const data = JSON.parse(request.data);
+  t.deepEqual(data.assets[0], assetPut);
+});
+
+test('get asset by id (failures)', async (t) => {
+  const client = new MockDAM();
+  const fail404 = client.assets.get('fail404');
+
+  await t.throwsAsync(fail404);
+
+  const badId = client.assets.get('badId');
+
+  await t.throwsAsync(badId);
 });

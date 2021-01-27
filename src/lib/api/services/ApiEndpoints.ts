@@ -1,12 +1,27 @@
 import { HttpMethod } from '../../http/HttpRequest';
-import { Asset, AssetsList } from '../../model/Asset';
+import { Asset, AssetsList, AssetsPage } from '../../model/Asset';
 import { AssetListRequest } from '../../model/AssetListRequest';
 import { AssetMetadata } from '../../model/AssetMetadata';
 import { AssetPut } from '../../model/AssetPut';
+import { AssetPutResultList } from '../../model/AssetPutResult';
 import { AssetText, AssetTextList } from '../../model/AssetText';
 import { Settings } from '../../model/Settings';
 import { StringList } from '../../model/StringList';
 import { ApiClient } from './ApiClient';
+
+/**
+ * Properties to strip from an asset before PUT.
+ * This allows updating an Asset with an existing Asset, rather than an AssetPut.
+ * NOTE: Tags are not supported as they must be added/removed as a delta, rather than replaced.
+ */
+const assetStrip = [
+  'revisionNum',
+  'userId',
+  'file',
+  'createdDate',
+  'timestamp',
+  'tags',
+];
 
 export class ApiEndpoints {
   constructor(private client: ApiClient) {}
@@ -37,29 +52,60 @@ export class ApiEndpoints {
     },
 
     /**
-     * Create or update an existing asset.
-     * @param asset asset to upload to the DAM API.
+     * Create or update an existing asset with new information.
+     * @param assets assets to upload to the DAM API.
      * @returns A list of asset GUIDs. Throws on failure.
      */
-
-    // strip: revisionNum, userID, file, createdDate, timestamp
     put: (
       mode: 'overwrite' | 'renameUnique',
       assets: AssetPut[]
-    ): Promise<StringList> =>
-      this.client.genericRequest<StringList>(
+    ): Promise<AssetPutResultList> =>
+      this.client.genericRequest<AssetPutResultList>(
         '/assets',
         HttpMethod.PUT,
         { mode, assets },
         {},
-        StringList
+        AssetPutResultList
       ),
+
+    /**
+     * Create or update an existing asset, based on an existing asset.
+     * NOTE: Tags must be added/removed via the put() method.
+     * @param assets assets to upload to the DAM API.
+     * @returns A list of asset GUIDs. Throws on failure.
+     */
+    putAsset: (
+      mode: 'overwrite' | 'renameUnique',
+      assets: Asset[]
+    ): Promise<AssetPutResultList> => {
+      const assetPuts = assets.map((asset) => {
+        const copy = asset.toJSON();
+
+        assetStrip.forEach((key) => {
+          delete copy[key];
+        });
+
+        if (asset.workflow && asset.workflow.assignedTo == null) {
+          delete copy.workflow;
+        }
+
+        return copy;
+      });
+
+      return this.client.genericRequest<AssetPutResultList>(
+        '/assets',
+        HttpMethod.PUT,
+        { mode, assets: assetPuts },
+        {},
+        AssetPutResultList
+      );
+    },
 
     /**
      * Retrieve a list of asset resources shared with your client credentials.
      * @param options Pagination options
      */
-    list: (options?: AssetListRequest): Promise<AssetsList> => {
+    list: (options?: AssetListRequest): Promise<AssetsPage> => {
       if (options && options.q) {
         options.q = options.q.replace(/ /g, '+');
       }
@@ -68,7 +114,7 @@ export class ApiEndpoints {
         '/assets{?q,filter,c,n,s,f,bucket,select,variants,preferredLocales,snippetSize,hl.fl,hl.pre,hl.post,hl.max,localeGroups.collapse,localeGroups.preferredLocales,localeGroups.limit,sort}',
         //
         { query: options },
-        AssetsList
+        AssetsPage
       );
     },
 

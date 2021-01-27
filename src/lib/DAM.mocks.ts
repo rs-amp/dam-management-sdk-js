@@ -10,13 +10,14 @@ import { OAuth2ClientCredentials } from './oauth2/models/OAuth2ClientCredentials
  * @hidden
  */
 import MockAdapter from 'axios-mock-adapter';
-import { DAMFixtures } from './_fixtures/DAMFixtures';
+import { DAMFixtures } from './_fixtures/DAMFixtures.mocks';
 
 /**
  * @hidden
  */
 export class MockDAM extends DAM {
   public mock: MockAdapter;
+  public mockClient: ApiClient;
 
   constructor(
     clientCredentials?: OAuth2ClientCredentials,
@@ -61,6 +62,7 @@ export class MockDAM extends DAM {
       httpClient
     );
     this.mock = new MockAdapter((httpClient as AxiosHttpClient).client);
+    this.mockClient = client;
     DAMFixtures.install(this.mock);
     return client;
   }

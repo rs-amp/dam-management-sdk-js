@@ -38,8 +38,6 @@ export interface DiSettings {
 }
 
 export class Settings extends ApiResource {
-  protected baseType = 'settings';
-
   companyId: string;
   companyClassificationType: string;
   system: SystemSettings;

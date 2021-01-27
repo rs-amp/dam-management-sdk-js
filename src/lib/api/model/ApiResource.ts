@@ -23,11 +23,6 @@ export class ApiResource {
   protected client?: ApiClient;
 
   /**
-   * The base type of this resource. Used to make linked requests.
-   */
-  protected baseType: string;
-
-  /**
    * Creates a new instance of the resource.
    * If data is provided it will be parsed as if it had
    * come from the remote api.
@@ -56,14 +51,6 @@ export class ApiResource {
     delete result._links;
     delete result.related;
     return result;
-  }
-
-  /**
-   * Returns a copy of this resource's attributes excluding links and client references
-   * @deprecated
-   */
-  public toJson(): any {
-    return this.toJSON();
   }
 
   /**

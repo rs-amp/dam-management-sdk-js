@@ -1,4 +1,11 @@
 export interface TagsPut {
-  remove: string[];
-  add: string[];
+  /**
+   * Tags to remove from an asset.
+   */
+  remove?: string[];
+
+  /**
+   * Tags to add to an asset.
+   */
+  add?: string[];
 }

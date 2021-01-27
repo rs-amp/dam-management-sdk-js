@@ -8,6 +8,10 @@ interface DamFixtureParameters {
   [K: string]: string | string[];
 }
 
+function escapeForRegex(url: string): string {
+  return url.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
 export class DAMFixtures {
   static install(adapter: MockAdapter): void {
     // Load fixtures.
@@ -135,24 +139,24 @@ export class DAMFixtures {
 
     const responseCode = method === 'POST' ? 204 : 200;
 
-    // tslint:disable-next-line
-    //console.log('Adding method ' + method + fullUri);
+    // Allow any url with query string
+    const regex = new RegExp('^' + escapeForRegex(fullUri) + '(\\?.*$)?$');
 
     switch (method) {
       case 'GET':
-        adapter.onGet(fullUri).reply(responseCode, response);
+        adapter.onGet(regex).reply(responseCode, response);
         break;
       case 'POST':
-        adapter.onPost(fullUri).reply(responseCode, response);
+        adapter.onPost(regex).reply(responseCode, response);
         break;
       case 'PATCH':
-        adapter.onPatch(fullUri).reply(responseCode, response);
+        adapter.onPatch(regex).reply(responseCode, response);
         break;
       case 'PUT':
-        adapter.onPut(fullUri).reply(responseCode, response);
+        adapter.onPut(regex).reply(responseCode, response);
         break;
       case 'DELETE':
-        adapter.onDelete(fullUri).reply(responseCode, response);
+        adapter.onDelete(regex).reply(responseCode, response);
         break;
     }
   }

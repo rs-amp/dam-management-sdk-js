@@ -2,11 +2,11 @@ import { PublishActivitySummary } from './PublishActivitySummary';
 import { TagsPut } from './TagsPut';
 import { WorkflowSummary } from './WorkflowSummary';
 
-export class AssetPut {
+export interface AssetPut {
   /**
    * Path to the input file. E.g. http://url... s3://.... multipart://...
    */
-  src: string;
+  src?: string;
 
   /**
    * UUID identifier for the asset
@@ -16,12 +16,12 @@ export class AssetPut {
   /**
    * ['image' or 'video' or 'set' or 'spin' or 'document' or 'other']: Sets the type of media to create
    */
-  type: string;
+  type?: string;
 
   /**
    * Unique name for the asset, this is unique across the account so we can flatten the it on the public URL
    */
-  name: string;
+  name?: string;
 
   /**
    * Friendly label for the asset, this is what a customer will see. If not specified this will default to srcName.
@@ -36,7 +36,7 @@ export class AssetPut {
   /**
    * Original filename
    */
-  srcName: string;
+  srcName?: string;
 
   /**
    * ['active' or 'deleted' or 'expired']: Lifecycle Status, defaults to Active

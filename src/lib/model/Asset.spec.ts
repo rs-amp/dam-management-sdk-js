@@ -327,7 +327,7 @@ function sharedPut(
   for (let i = 0; i < requestIds.length; i++) {
     const request = client.mock.history.put[i];
 
-    t.is(request.url, 'https://dam-live-api.adis.ws/v1.5.0/assets');
+    t.is(request.url, 'https://dam-api.amplience.net/v1.5.0/assets');
 
     // Must strip reserved fields from body.
 
@@ -399,7 +399,7 @@ test('put assets (using asset put interface)', async (t) => {
 
   const request = client.mock.history.put[0];
 
-  t.is(request.url, 'https://dam-live-api.adis.ws/v1.5.0/assets');
+  t.is(request.url, 'https://dam-api.amplience.net/v1.5.0/assets');
 
   const data = JSON.parse(request.data);
   t.deepEqual(data.assets[0], assetPut);

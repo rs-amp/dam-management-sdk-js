@@ -69,7 +69,7 @@ export class DAMFixtures {
     path: string,
     params: DamFixtureParameters
   ): void {
-    const baseUri = 'https://dam-live-api.adis.ws/v1.5.0/';
+    const baseUri = 'https://dam-api.amplience.net/v1.5.0/';
 
     const baseName = basename(path, '.json');
     let dirName = relative(__dirname, dirname(path));

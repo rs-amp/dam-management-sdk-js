@@ -14,13 +14,13 @@ import { OAuth2Client } from './oauth2/services/OAuth2Client';
 export interface DAMConfig {
   /**
    * URL used to connect to the Amplience DAM API.
-   * This property defaults to 'https://dam-live-api.adis.ws/v1.5.0' if not provided
+   * This property defaults to 'https://dam-api.amplience.net/v1.5.0' if not provided
    */
   apiUrl?: string;
 
   /**
    * URL used to connect to the Amplience OAuth API.
-   * This property defaults to 'https://auth.adis.ws' if not provided
+   * This property defaults to 'https://auth.amplience.net' if not provided
    */
   authUrl?: string;
 }
@@ -56,8 +56,8 @@ export class DAM {
   ) {
     damConfig = damConfig || {};
     damConfig.apiUrl =
-      damConfig.apiUrl || 'https://dam-live-api.adis.ws/v1.5.0';
-    damConfig.authUrl = damConfig.authUrl || 'https://auth.adis.ws';
+      damConfig.apiUrl || 'https://dam-api.amplience.net/v1.5.0';
+    damConfig.authUrl = damConfig.authUrl || 'https://auth.amplience.net';
 
     let httpClientInstance: HttpClient;
     if (httpClient !== undefined && 'request' in httpClient) {

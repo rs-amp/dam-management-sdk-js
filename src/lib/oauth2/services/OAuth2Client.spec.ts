@@ -23,7 +23,7 @@ test('get token should request a token on the first invocation', async (t) => {
   const mock = new MockAdapter(httpClient.client);
   mock
     .onPost(
-      'https://auth.adis.ws/oauth/token',
+      'https://auth.amplience.net/oauth/token',
       'grant_type=client_credentials&client_id=client_id&client_secret=client_secret'
     )
     .reply(200, {
@@ -49,7 +49,7 @@ test('get token should cache tokens', async (t) => {
   const mock = new MockAdapter(httpClient.client);
   mock
     .onPost(
-      'https://auth.adis.ws/oauth/token',
+      'https://auth.amplience.net/oauth/token',
       'grant_type=client_credentials&client_id=client_id&client_secret=client_secret'
     )
     .reply(200, {
@@ -62,7 +62,7 @@ test('get token should cache tokens', async (t) => {
 
   mock
     .onPost(
-      'https://auth.adis.ws/oauth/token',
+      'https://auth.amplience.net/oauth/token',
       'grant_type=client_credentials&client_id=client_id&client_secret=client_secret'
     )
     .reply(200, {
@@ -91,7 +91,7 @@ test('cached tokens should expire', async (t) => {
   const mock = new MockAdapter(httpClient.client);
   mock
     .onPost(
-      'https://auth.adis.ws/oauth/token',
+      'https://auth.amplience.net/oauth/token',
       'grant_type=client_credentials&client_id=client_id&client_secret=client_secret'
     )
     .reply(200, {
@@ -104,7 +104,7 @@ test('cached tokens should expire', async (t) => {
 
   mock
     .onPost(
-      'https://auth.adis.ws/oauth/token',
+      'https://auth.amplience.net/oauth/token',
       'grant_type=client_credentials&client_id=client_id&client_secret=client_secret'
     )
     .reply(200, {
@@ -134,7 +134,7 @@ test('only one token refresh should be in flight at once', async (t) => {
 
   mock
     .onPost(
-      'https://auth.adis.ws/oauth/token',
+      'https://auth.amplience.net/oauth/token',
       'grant_type=client_credentials&client_id=client_id&client_secret=client_secret'
     )
     .replyOnce(200, {

@@ -67,6 +67,12 @@ export class OAuth2Client implements AccessTokenProvider {
           );
         }
 
+        if (response.status !== 200) {
+          throw new Error(
+            `Authorization failed (${response.status}): ${response.data}`
+          );
+        }
+
         this.token = response.data as any;
         this.tokenExpires = Date.now() + this.token.expires_in * 1000;
         this.inFlight = null;

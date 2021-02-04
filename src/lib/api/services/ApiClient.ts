@@ -81,7 +81,8 @@ export class DefaultApiClient implements ApiClient {
     params: ApiParameters
   ): Promise<T> {
     path = CURIEs.expand(path, params.query);
-    path = path.replace(/%2B/g, '+'); // Unescape +
+    path = path.replace(/%20/g, '+'); // Convert space to +
+
     const response = await this.invoke({
       method: HttpMethod.GET,
       url: path,

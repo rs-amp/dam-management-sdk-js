@@ -106,10 +106,6 @@ export class ApiEndpoints {
      * @param options Pagination options
      */
     list: (options?: AssetListRequest): Promise<AssetsPage> => {
-      if (options && options.q) {
-        options.q = options.q.replace(/ /g, '+');
-      }
-
       return this.client.fetchResource(
         '/assets{?q,filter,c,n,s,f,bucket,select,variants,preferredLocales,snippetSize,hl.fl,hl.pre,hl.post,hl.max,localeGroups.collapse,localeGroups.preferredLocales,localeGroups.limit,sort}',
         //

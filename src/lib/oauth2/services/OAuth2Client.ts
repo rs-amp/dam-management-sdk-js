@@ -68,8 +68,10 @@ export class OAuth2Client implements AccessTokenProvider {
         }
 
         if (response.status !== 200) {
+          const responseText = response.data['error_description'] || JSON.stringify(response.data);
+
           throw new Error(
-            `Authorization failed (${response.status}): ${response.data}`
+            `Authorization failed (${response.status}): ${responseText}`
           );
         }
 
